@@ -1,0 +1,99 @@
+
+  patientsCustomList: PatientsCustomList[] | undefined = [];
+  onViewPatientOptionChange(event: any) {
+    this.loaderService.show();
+    this.first = 0;
+    this.patientStatus = event.value == 'Inactive Patients' ? 'Inactive' : 'Active';
+
+    this.managePatientService.getPatientsList(this.currentUser?.siteId, this.patientStatus)
+      .subscribe(
+        (res: any) => {
+          this.patientsCustomList = res as PatientsCustomList[];
+          this.loaderService.hide();
+        },
+        (err: any) => {
+          this.error = err;
+          this.loaderService.hide();
+        }
+      );
+
+    if (this.patientsCustomList) {
+      console.log("custom called");
+
+      this.customSorting(this.patientsCustomList);
+    }
+  }
+
+
+  importedPatients: PatientsCustomList[] | undefined = [];
+  notAssignedPlan: PatientsCustomList[] | undefined = [];
+  assignedPlan: PatientsCustomList[] | undefined = [];
+  // private customSorting(patientsCustomList: PatientsCustomList[]) {
+  //   if (patientsCustomList) {
+  //     for (let i = 0; i < patientsCustomList.length; i++) {
+  //       const currentPatient = patientsCustomList[i];
+
+  //       // Check if deviceType is a string and is empty or null, createdBy is 'system-sql', and status is 'inactive'
+  //       if (
+  //         typeof currentPatient.deviceType === 'string' &&
+  //         (currentPatient.deviceType.toLowerCase() == '' || currentPatient.deviceType.toLowerCase() == null) &&
+  //         currentPatient.createdBy.toLowerCase() == 'system-sql' &&
+  //         currentPatient.status.toLowerCase() == 'inactive'
+  //       ) {
+  //         console.log("Condition met for patient at index", i);
+  //       } else {
+  //         console.log("Hello world in else")
+  //       }
+  //     }
+  //   }
+  // }
+
+
+  private customSorting(patientsCustomList: PatientsCustomList[]) {
+    if (patientsCustomList) {
+      this.filteredPatientList = [];
+      for (let i = 0; i < patientsCustomList.length; i++) {
+        const currentPatient = patientsCustomList[i];
+
+        if (
+          this.conditionForAssignedMonitoringPlan(currentPatient) ||
+          this.conditionForNotAssignedMonitoringPlan(currentPatient) ||
+          this.conditionForActivePatients(currentPatient) ||
+          this.conditionForImportedPatients(currentPatient) ||
+          this.conditionForInactivePatients(currentPatient)
+        ) {
+          console.log("yes");
+
+          console.log(JSON.stringify(currentPatient));
+
+          this.filteredPatientList.push(currentPatient);
+        }
+      }
+      this.patientList = this.filteredPatientList;
+    }
+  }
+
+  // Define your conditions as separate functions
+  private conditionForAssignedMonitoringPlan(patient: PatientsCustomList): boolean {
+    return patient.planAssigned === true;
+  }
+
+  private conditionForNotAssignedMonitoringPlan(patient: PatientsCustomList): boolean {
+    return patient.planAssigned === false;
+  }
+
+  private conditionForActivePatients(patient: PatientsCustomList): boolean {
+    return patient.status !== 'Inactive' && patient.deviceType !== '';
+  }
+
+  private conditionForImportedPatients(patient: PatientsCustomList): boolean {
+    return (
+      patient.status !== 'Inactive' &&
+      patient.createdBy === 'system-SQL' &&
+      (patient.deviceType === null || patient.deviceType === '')
+    );
+  }
+
+  private conditionForInactivePatients(patient: PatientsCustomList): boolean {
+    return patient.status === 'Inactive';
+  }
