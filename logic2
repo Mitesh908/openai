@@ -1,0 +1,73 @@
+
+  /*
+      onViewPatientOptionChange(event: any) {
+        this.loaderService.show();
+        this.first = 0;
+        this.patientStatus =
+          event.value == 'Inactive Patients' ? 'Inactive' : 'Active';
+        this.managePatientService
+          .getPatientsList(this.currentUser?.siteId, this.patientStatus)
+          .subscribe(
+            (res: any) => {
+              this.filteredPatientList = [];
+              this.patientList = [];
+              if (event.value == 'Assigned Monitoring Plan Patients') {
+                res.forEach((o: any) => {
+                  if (o.planAssigned == true) {
+                    this.filteredPatientList.push(o);
+                    console.log('assigned')
+                  }
+                });
+                this.selectedPatient = this.viewPatientOptions[2].value;
+                this.managePatientService.updateViewOption(this.selectedPatient);
+              }
+              if (event.value == 'Not Assigned Monitoring Plan Patients') {
+                res.forEach((o: any) => {
+                  if (o.planAssigned == false) {
+                    this.filteredPatientList.push(o);
+                  }
+                });
+                this.selectedPatient = this.viewPatientOptions[3].value;
+                this.managePatientService.updateViewOption(this.selectedPatient);
+              }
+              if (event.value == 'Active Patients') {
+                res.forEach((o: any) => {
+                  if (o.status != 'Inactive' && o.deviceType !== '') {
+                    this.filteredPatientList.push(o);
+                  }
+                });
+                this.selectedPatient = this.viewPatientOptions[0].value;
+                this.managePatientService.updateViewOption(this.selectedPatient);
+              }
+              if (event.value == 'Imported Patients') {
+                res.forEach((o: any) => {
+                  if (
+                    o.status != 'Inactive' &&
+                    o.createdBy == 'system-SQL' &&
+                    (o.deviceType == null || o.deviceType == '')
+                  ) {
+                    this.filteredPatientList.push(o);
+                  }
+                });
+                this.selectedPatient = this.viewPatientOptions[1].value;
+                this.managePatientService.updateViewOption(this.selectedPatient);
+              }
+              if (event.value == 'Inactive Patients') {
+                res.forEach((o: any) => {
+                  if (o.status == 'Inactive') {
+                    this.filteredPatientList.push(o);
+                  }
+                });
+                this.selectedPatient = this.viewPatientOptions[4].value;
+                this.managePatientService.updateViewOption(this.selectedPatient);
+              }
+              this.patientList = this.filteredPatientList;
+              this.loaderService.hide();
+            },
+            (err: any) => {
+              this.error = err;
+              this.loaderService.hide();
+            }
+          );
+      }
+  */
